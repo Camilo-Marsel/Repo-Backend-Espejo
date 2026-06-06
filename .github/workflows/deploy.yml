@@ -1,0 +1,50 @@
+name: Deploy — Render
+
+on:
+  push:
+    branches: [qa, main]
+
+jobs:
+  deploy-staging:
+    name: Deploy → Staging (qa)
+    if: github.ref == 'refs/heads/qa'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Trigger Render staging deploy
+        run: |
+          curl -f -X POST "${{ secrets.RENDER_DEPLOY_HOOK_STAGING }}"
+          echo "Deploy a staging disparado correctamente"
+
+      - name: Wait and check health
+        run: |
+          echo "Esperando 60s para que el servicio arranque..."
+          sleep 60
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.RENDER_STAGING_URL }}/actuator/health")
+          if [ "$STATUS" != "200" ]; then
+            echo "Health check fallido — HTTP $STATUS"
+            exit 1
+          fi
+          echo "Staging saludable — HTTP $STATUS"
+
+  deploy-production:
+    name: Deploy → Production (main)
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Trigger Render production deploy
+        run: |
+          curl -f -X POST "${{ secrets.RENDER_DEPLOY_HOOK_PROD }}"
+          echo "Deploy a producción disparado correctamente"
+
+      - name: Wait and check health
+        run: |
+          echo "Esperando 90s para que el servicio arranque..."
+          sleep 90
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.RENDER_PROD_URL }}/actuator/health")
+          if [ "$STATUS" != "200" ]; then
+            echo "Health check fallido — HTTP $STATUS"
+            exit 1
+          fi
+          echo "Producción saludable — HTTP $STATUS"

@@ -1,0 +1,62 @@
+services:
+  - type: web
+    name: banco-digital-prod
+    runtime: docker
+    branch: main
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: GATEWAY_SECRET
+        sync: false
+      - key: CORS_ORIGENES
+        sync: false
+      - key: DDL_AUTO
+        value: update
+      - key: HTTPS_SEGURO
+        value: "true"
+      - key: SHOW_SQL
+        value: "false"
+      - key: PORT
+        value: "8080"
+      - key: SPRING_PROFILES_ACTIVE
+        value: ""
+
+  - type: web
+    name: banco-digital-staging
+    runtime: docker
+    branch: qa
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: GATEWAY_SECRET
+        sync: false
+      - key: CORS_ORIGENES
+        sync: false
+      - key: DDL_AUTO
+        value: update
+      - key: HTTPS_SEGURO
+        value: "true"
+      - key: SHOW_SQL
+        value: "false"
+      - key: PORT
+        value: "8080"
+      - key: SPRING_PROFILES_ACTIVE
+        value: ""
